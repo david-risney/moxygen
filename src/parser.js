@@ -15,6 +15,8 @@ var Compound = require('./compound');
 var helpers = require('./helpers');
 var markdown = require('./markdown');
 
+var graphCounter = 1;
+
 function toMarkdown(element, context) {
   var s = '';
   context = context || [];
@@ -97,6 +99,9 @@ function toMarkdown(element, context) {
           case 'mdash': s = '&mdash;'; break;
           case 'ndash': s = '&ndash;'; break;
           case 'linebreak': s = '<br/>'; break;
+          case 'dot':
+            context.push(element);
+            break;
 
           case 'xreftitle':
           case 'entry':
@@ -158,6 +163,11 @@ function toMarkdown(element, context) {
                 s += (i ? ' | ' : '\n') + '---------';
               });
             }
+            break;
+          case 'dot':
+            context.pop();
+            s = `![dot_inline_dotgraph_${graphCounter}.png]`;
+            graphCounter++;
             break;
         }
 
