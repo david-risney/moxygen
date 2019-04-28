@@ -166,7 +166,7 @@ function toMarkdown(element, context) {
             break;
           case 'dot':
             context.pop();
-            s = `![dot_inline_dotgraph_${graphCounter}.png]`;
+            s = `![dot_inline_dotgraph_${graphCounter}.png](dot_inline_dotgraph_${graphCounter}.png)`;
             graphCounter++;
             break;
         }
