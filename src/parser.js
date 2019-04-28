@@ -507,17 +507,15 @@ module.exports = {
 
       this.parseMembers(compound, element.$, element.member);
 
-      if (compound.kind !== 'file') { // && compound.kind !== 'file'
-        log.verbose('Parsing ' + path.join(options.directory, compound.refid + '.xml'));
-        doxygen = fs.readFileSync(path.join(options.directory, compound.refid + '.xml'), 'utf8');
-        xmlParser.parseString(doxygen, function (err, data) {
-          if (err) {
-            log.verbose('warning - parse error for file' , path.join(options.directory, compound.refid + '.xml'))
-            return;
-          }
-            this.parseCompound(compound, data.doxygen.compounddef[0]);
-        }.bind(this));
-      }
+      log.verbose('Parsing ' + path.join(options.directory, compound.refid + '.xml'));
+      doxygen = fs.readFileSync(path.join(options.directory, compound.refid + '.xml'), 'utf8');
+      xmlParser.parseString(doxygen, function (err, data) {
+        if (err) {
+          log.verbose('warning - parse error for file' , path.join(options.directory, compound.refid + '.xml'))
+          return;
+        }
+          this.parseCompound(compound, data.doxygen.compounddef[0]);
+      }.bind(this));
 
     }.bind(this));
   },

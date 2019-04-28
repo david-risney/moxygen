@@ -95,7 +95,7 @@ module.exports = {
         });
       }
       else if (options.classes) {
-        var rootCompounds = root.toArray('compounds', 'namespace');
+        var rootCompounds = root.toArray('compounds', ['namespace', 'interface', 'file']);
         if (!rootCompounds.length)
           throw "You have enabled `classes` output, but no classes were " +
             "located in your doxygen XML files."

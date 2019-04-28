@@ -30,7 +30,11 @@ Compound.prototype = {
     return compound;
   },
 
-  toArray: function (type, kind) {
+  toArray: function (type, kindOrKinds) {
+    var kinds = kindOrKinds || [];
+    if (typeof kindOrKinds === "string") {
+      kinds = [kindOrKinds];
+    }
     type = type || 'compounds';
     var arr = Object.keys(this[type]).map(function(key) {
       return this[key];
@@ -39,9 +43,9 @@ Compound.prototype = {
     if (type == 'compounds') {
       var all = new Array();
       arr.forEach(function (compound) {
-        if (!kind || compound.kind == kind) { //compound &&
+        if (kinds.length == 0 || kinds.indexOf(compound.kind) !== -1) { //compound &&
           all.push(compound);
-          all = all.concat(compound.toArray(type, kind));
+          all = all.concat(compound.toArray(type, kinds));
         }
       }.bind(this));
       arr = all;
