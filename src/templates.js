@@ -54,7 +54,7 @@ module.exports = {
         template = 'namespace';
         break;
       case 'file':
-        template = 'namespace';
+        template = 'file';
         break;
       case 'class':
       case 'struct':
