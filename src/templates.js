@@ -93,5 +93,14 @@ module.exports = {
     handlebars.registerHelper('anchor', function(name) {
       return helpers.getAnchor(name, options);
     });
+
+    handlebars.registerHelper('impAnchor', function(name) {
+      return helpers.getImpAnchor(name);
+    });
+
+    handlebars.registerHelper('linkCell', function(name) {
+      name = '[' + name + ']';
+      return name.replace(/\|/g, '\\|').replace(/\n/g, '<br/>');
+    });
   }
 };

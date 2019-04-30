@@ -14,7 +14,7 @@ var handlebars = require('handlebars');
 
 module.exports = {
 
-  inline: function(code) {
+  inline: function(code, withBlock) {
     if (Array.isArray(code)) {
       var refs, s = '', isInline = false;
       code.forEach(function (e) {
@@ -24,25 +24,44 @@ module.exports = {
             // link
             var link = f.match(/\[(.*)\]\((.*)\)/);
             if (link) {
-              isInline ? (s += '`') && (isInline = false) : null;
-              s += '[`' + link[1] + '`](' + link[2] + ')';
+              if (withBlock) {
+                isInline ? (s += '`') && (isInline = false) : null;
+                s += '[`' + link[1] + '`](' + link[2] + ')';
+              }
+              else {
+                s += '[' + link[1] + '](' + link[2] + ')';
+              }
             }
           }
           else if (f == '\n' || f == '  \n') {
             // line break
-            isInline ? (s += '`') && (isInline = false) : null;
+            if (withBlock) {
+              isInline ? (s += '`') && (isInline = false) : null;
+            }
             s += f;
           }
           else if (f) {
-            !isInline ? (s += '`') && (isInline = true) : null;
+            if (withBlock) {
+              !isInline ? (s += '`') && (isInline = true) : null;
+            }
             s += f;
           }
         });
       });
-      return s + (isInline ? '`' : '');
+      if( withBlock) {
+        return s + (isInline ? '`' : '');
+      }
+      else {
+        return s;
+      }
     }
     else {
-      return '`' + code + '`';
+      if (withBlock) {
+        return '`' + code + '`';
+      }
+      else {
+        return code;
+      }
     }
   },
 
@@ -57,6 +76,11 @@ module.exports = {
       return '';
     }
   },
+
+  getImpAnchor: function(name) {
+    return '(#' + name.toLowerCase() + ')';
+  },
+
 
   findParent: function(compound, kinds) {
     while (compound) {

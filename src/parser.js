@@ -16,6 +16,7 @@ var helpers = require('./helpers');
 var markdown = require('./markdown');
 
 var graphCounter = 1;
+var isCodeLine = false;
 
 function toMarkdown(element, context) {
   var s = '';
@@ -35,7 +36,11 @@ function toMarkdown(element, context) {
 
         // opening the element
         switch (element['#name']) {
-          case 'ref': return s + markdown.refLink(toMarkdown(element.$$), element.$.refid);
+          case 'ref':
+            if (isCodeLine === false) {
+              return s + markdown.refLink(toMarkdown(element.$$), element.$.refid);
+            }
+            return s + toMarkdown(element.$$);
           case '__text__': s = element._; break;
           case 'emphasis': s = '*'; break;
           case 'bold': s = '**'; break;
@@ -108,6 +113,8 @@ function toMarkdown(element, context) {
           case 'row':
           case 'ulink':
           case 'codeline':
+            isCodeLine = true;
+            break;
           case 'highlight':
           case 'table':
           case 'para':
@@ -139,7 +146,10 @@ function toMarkdown(element, context) {
           case 'parametername': s += '` '; break;
           case 'entry': s = markdown.escape.cell(s) + '|'; break;
           case 'programlisting': s += '```\n'; break;
-          case 'codeline': s += '\n'; break;
+          case 'codeline': 
+            isCodeLine = false;
+            s += '\n'; 
+            break;
           case 'ulink': s = markdown.link(s, element.$.url); break;
           case 'orderedlist':
             context.pop();
@@ -319,7 +329,7 @@ module.exports = {
         break;
     }
 
-    member.proto = helpers.inline(m);
+    member.proto = helpers.inline(m, false);
   },
 
   assignToNamespace: function (compound, child) {
@@ -429,7 +439,7 @@ module.exports = {
       }.bind(this));
     }
 
-    compound.proto = helpers.inline([compound.kind, ' ', markdown.refLink(compound.name, compound.refid)]);
+    compound.proto = helpers.inline([compound.kind, ' ', markdown.refLink(compound.name, compound.refid)], false);
 
     // kind specific parsing
     switch (compound.kind) {
