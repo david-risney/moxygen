@@ -77,8 +77,12 @@ module.exports = {
     }
   },
 
-  getImpAnchor: function(name) {
-    return '(#' + name.toLowerCase() + ')';
+  getImpAnchor: function(name, options) {
+    if (options.implicitAnchors) {
+      return '(#' + name.toLowerCase() + ')';
+    } else {
+      return '';
+    }
   },
 
 
@@ -96,25 +100,31 @@ module.exports = {
       var ref = references[refid]
       var page = this.findParent(ref, ['page']);
 
+      var id;
+      if (options.implicitAnchors) {
+        id = ref.name.toLowerCase();
+      } else {
+        id = refid;
+      }
       if (page) {
         if (page.refid == compound.refid)
-          return '#' + refid;
-        return this.compoundPath(page, options) + '#' + refid;
+          return '#' + id;
+        return this.compoundPath(page, options) + '#' + id;;
       }
 
       if (options.groups) {
         if (compound.groupid && compound.groupid == ref.groupid)
-          return '#' + refid;
-        return this.compoundPath(ref, options) + '#' + refid;
+          return '#' + id;
+        return this.compoundPath(ref, options) + '#' + id;
       } else if (options.classes) {
         var dest = this.findParent(ref, ['namespace', 'class', 'struct', 'interface']);
         if (!dest || compound.refid == dest.refid)
-          return '#' + refid;
-        return this.compoundPath(dest, options) + '#' + refid;
+          return '#' + id;
+        return this.compoundPath(dest, options) + '#' + id;
       } else {
         if (compound.kind == 'page')
-          return this.compoundPath(compound.parent, options) + '#' + refid;
-        return '#' + refid;
+          return this.compoundPath(compound.parent, options) + '#' + id;
+        return '#' + id;
       }
     }.bind(this));
   },

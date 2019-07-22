@@ -15,6 +15,7 @@ program.version(pjson.version)
   .option('-p, --pages', 'output doxygen pages into separate files', false)
   .option('-n, --noindex', 'disable generation of the index (no effect with `groups` option', false)
   .option('-a, --anchors', 'add anchors to internal links', false)
+  .option('-i, --implicit-anchors', 'add implicit anchors to internal links', false)
   .option('-h, --html-anchors', 'add html anchors to internal links', false)
   .option('-l, --language <lang>', 'programming language', String, 'cpp')
   .option('-t, --templates <dir>', 'custom templates directory', String, 'templates')
@@ -35,6 +36,7 @@ if (program.args.length) {
     noindex: program.noindex,
     anchors: program.anchors,
     htmlAnchors: program.htmlAnchors,
+    implicitAnchors: program.implicitAnchors,
     language: program.language,
     templates: program.templates
   }));

@@ -95,7 +95,7 @@ module.exports = {
     });
 
     handlebars.registerHelper('impAnchor', function(name) {
-      return helpers.getImpAnchor(name);
+      return helpers.getImpAnchor(name, options);
     });
 
     handlebars.registerHelper('linkCell', function(name) {

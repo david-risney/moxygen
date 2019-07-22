@@ -31,6 +31,7 @@ Moxygen is currently used in conjunction with GitBook to generate the API docume
     -c, --classes          output doxygen classes into separate files
     -n, --noindex          disable generation of the index (no effect with `groups` option
     -a, --anchors          add anchors to internal links
+    -i, --implicit-anchors add implicit anchors to internal links
     -l, --language <lang>  programming language
     -t, --templates <dir>  custom templates directory
     -q, --quiet            quiet mode
