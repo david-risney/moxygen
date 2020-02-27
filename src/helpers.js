@@ -120,7 +120,7 @@ module.exports = {
         var dest = this.findParent(ref, ['namespace', 'class', 'struct', 'interface']);
         if (!dest || compound.refid == dest.refid)
           return '#' + id;
-        return this.compoundPath(dest, options) + '#' + id;
+        return this.compoundPath(dest, options);
       } else {
         if (compound.kind == 'page')
           return this.compoundPath(compound.parent, options) + '#' + id;
