@@ -52,10 +52,10 @@ function toMarkdown(element, context) {
           case 'computeroutput': s = '`'; break;
           case 'parameterlist':
             if (element.$.kind == 'exception') {
-              s = '\n#### Exceptions\n'
+              s = '\n##### Exceptions\n'
             }
             else {
-              s = '\n#### Parameters\n'
+              s = '\n##### Parameters\n'
             }
             break;
 
@@ -83,7 +83,7 @@ function toMarkdown(element, context) {
               s = '> ';
             }
             else if (element.$.kind == 'return') {
-              s = '\n#### Returns\n'
+              s = '\n##### Returns\n'
             }
             else if (element.$.kind == 'see') {
               s = '**See also**: '
