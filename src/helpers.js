@@ -137,6 +137,8 @@ module.exports = {
   compoundPath: function(compound, options) {
     if (compound.kind == 'page') {
       return path.dirname(options.output) + "/page-" + compound.name + ".md";
+    } else if (compound.kind == 'namespace') {
+      return path.dirname(options.output) + "/namespace-" + compound.name + ".md";
     } else if (options.groups) {
       return util.format(options.output, compound.groupname);
     } else if (options.classes) {
