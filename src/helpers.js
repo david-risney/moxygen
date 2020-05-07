@@ -138,11 +138,11 @@ module.exports = {
     if (compound.kind == 'page') {
       return path.dirname(options.output) + "/page-" + compound.name + ".md";
     } else if (compound.kind == 'namespace') {
-      return path.dirname(options.output) + "/namespace-" + compound.name + ".md";
+      return path.dirname(options.output) + "/namespace-" + compound.name.replace(/\./g, '-').toLowerCase() + ".md";
     } else if (options.groups) {
       return util.format(options.output, compound.groupname);
     } else if (options.classes) {
-      return util.format(options.output, compound.name.replace(/\:/g, '-'));
+      return util.format(options.output, compound.name.replace(/\:/g, '-').replace(/\./g, '-').toLowerCase());
     } else {
       return options.output;
     }
