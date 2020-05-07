@@ -86,7 +86,7 @@ function toMarkdown(element, context) {
               s = '\n##### Returns\n'
             }
             else if (element.$.kind == 'see') {
-              s = '**See also**: '
+              s = '\n**See also**: '
             }
             else {
               console.assert(element.$.kind + ' not supported.');
@@ -303,6 +303,11 @@ module.exports = {
         m = m.concat(memberdef.argsstring[0]._.match(/noexcept$/) ? ' noexcept' : '');
         m = m.concat(memberdef.argsstring[0]._.match(/=\s*delete$/) ? ' = delete' : '');
         m = m.concat(memberdef.argsstring[0]._.match(/=\s*default/) ? ' = default' : '');
+        if (memberdef.$.static == 'yes') {
+          m.forEach(element => {
+           console.log(element); 
+          });
+        }
         break;
 
       case 'variable':
