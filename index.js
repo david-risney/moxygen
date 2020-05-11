@@ -34,6 +34,7 @@ module.exports = {
         'define',
         'enum',
         // 'enumvalue',
+        'event',
         'func',
         // 'variable',
         'property',

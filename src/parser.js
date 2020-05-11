@@ -319,6 +319,14 @@ module.exports = {
         m = m.concat(markdown.refLink(member.name, member.refid));
         break;
 
+      case 'event':
+        // Add prot
+        m = m.concat(memberdef.$.prot, ' '); // public, private, ...
+        m = m.concat(toMarkdown(memberdef.type), ' ');
+        // m = m.concat(memberdef.name[0]._);
+        m = m.concat(markdown.refLink(member.name, member.refid));
+        break;
+        
       case 'property':
         // Do not append {property} for properties
         // m = m.concat(['{', member.kind, '} ']);
