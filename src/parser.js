@@ -255,6 +255,11 @@ module.exports = {
   parseMember: function (member, section, memberdef) {
     if (member.kind == 'typedef' && toMarkdown(memberdef.type).startsWith('enum'))
       return;
+  
+    // Hide private members
+    if (memberdef.$.prot == 'private')
+      return;
+
     log.verbose('Processing member ' + member.kind + ' ' + member.name);
     member.section = section;
     copy(member, 'briefdescription', memberdef);
