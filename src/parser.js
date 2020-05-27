@@ -256,8 +256,8 @@ module.exports = {
     if (member.kind == 'typedef' && toMarkdown(memberdef.type).startsWith('enum'))
       return;
   
-    // Hide private members
-    if (memberdef.$.prot == 'private')
+    // Hide protected and private members
+    if (memberdef.$.prot == 'protected' || memberdef.$.prot == 'private')
       return;
 
     log.verbose('Processing member ' + member.kind + ' ' + member.name);
