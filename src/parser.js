@@ -44,7 +44,12 @@ function toMarkdown(element, context) {
           case '__text__':
             // Append 'event ' if EventHandler 
             s = s.concat(element._.startsWith('EventHandler') ? 'event ' : []);
-            s = s.concat(element._);
+            // Remove question mark
+            if (element._.startsWith('bool?') || element._.startsWith('CoreWebView2?') || element._.startsWith('Uri?')) {
+              s = s.concat(element._.replace(/[?]+/g, ''));
+            } else {
+              s = s.concat(element._);
+            }
             break;
           case 'emphasis': s = '*'; break;
           case 'bold': s = '**'; break;
@@ -289,7 +294,8 @@ module.exports = {
         // m = m.concat(memberdef.$.inline == 'yes' ? ['inline', ' '] : []);
         m = m.concat(memberdef.$.static == 'yes' ? ['static', ' '] : []);
         m = m.concat(memberdef.$.virt == 'virtual' ? ['virtual', ' '] : []);
-        m = m.concat(toMarkdown(memberdef.type), ' ');
+        // Fixed extra space for constructor
+        m = m.concat(toMarkdown(memberdef.type) == '' ? [toMarkdown(memberdef.type), ' '] : []);
         m = m.concat(memberdef.$.explicit  == 'yes' ? ['explicit', ' '] : []);
         // m = m.concat(memberdef.name[0]._);
         m = m.concat(markdown.refLink(member.name, member.refid));
