@@ -41,22 +41,37 @@ function toMarkdown(element, context) {
               return s + markdown.refLink(toMarkdown(element.$$), element.$.refid);
             }
             return s + toMarkdown(element.$$);
-          case '__text__': s = element._; break;
+          case '__text__':
+            // Append 'event ' if EventHandler 
+            s = s.concat(element._.startsWith('EventHandler') ? 'event ' : []);
+            // Remove question mark
+            if (element._.startsWith('bool?') || element._.startsWith('CoreWebView2?') || element._.startsWith('Uri?')) {
+              s = s.concat(element._.replace(/[?]+/g, ''));
+            } else {
+              s = s.concat(element._);
+            }
+            break;
           case 'emphasis': s = '*'; break;
           case 'bold': s = '**'; break;
           case 'parametername':
           case 'computeroutput': s = '`'; break;
           case 'parameterlist':
             if (element.$.kind == 'exception') {
-              s = '\n#### Exceptions\n'
+              s = '\n##### Exceptions\n'
             }
             else {
-              s = '\n#### Parameters\n'
+              s = '\n##### Parameters\n'
             }
             break;
 
           case 'parameteritem': s = '* '; break;
-          case 'programlisting': s = '\n```cpp\n'; break;
+          case 'programlisting':
+            // Get the language information from filename
+            var lang = '';
+            if (typeof(element.$) !== 'undefined')
+              lang = element.$.filename.substring(element.$.filename.lastIndexOf('.') + 1);
+            s = '\n```' + lang + '\n';
+            break;
           case 'orderedlist':
             context.push(element);
             s = '\n\n';
@@ -73,10 +88,10 @@ function toMarkdown(element, context) {
               s = '> ';
             }
             else if (element.$.kind == 'return') {
-              s = '\n#### Returns\n'
+              s = '\n##### Returns\n'
             }
             else if (element.$.kind == 'see') {
-              s = '**See also**: '
+              s = '\n**See also**: '
             }
             else {
               console.assert(element.$.kind + ' not supported.');
@@ -245,6 +260,11 @@ module.exports = {
   parseMember: function (member, section, memberdef) {
     if (member.kind == 'typedef' && toMarkdown(memberdef.type).startsWith('enum'))
       return;
+  
+    // Hide protected and private members
+    if (memberdef.$.prot == 'protected' || memberdef.$.prot == 'private')
+      return;
+
     log.verbose('Processing member ' + member.kind + ' ' + member.name);
     member.section = section;
     copy(member, 'briefdescription', memberdef);
@@ -270,17 +290,20 @@ module.exports = {
           }
           m.push('>  \n');
         }
-        m = m.concat(memberdef.$.inline == 'yes' ? ['inline', ' '] : []);
+        // Do not mark inline
+        // m = m.concat(memberdef.$.inline == 'yes' ? ['inline', ' '] : []);
         m = m.concat(memberdef.$.static == 'yes' ? ['static', ' '] : []);
         m = m.concat(memberdef.$.virt == 'virtual' ? ['virtual', ' '] : []);
-        m = m.concat(toMarkdown(memberdef.type), ' ');
+        // Fixed extra space for constructor
+        m = m.concat(toMarkdown(memberdef.type) == '' ? [toMarkdown(memberdef.type), ' '] : []);
         m = m.concat(memberdef.$.explicit  == 'yes' ? ['explicit', ' '] : []);
         // m = m.concat(memberdef.name[0]._);
         m = m.concat(markdown.refLink(member.name, member.refid));
         m = m.concat('(');
         if (memberdef.param) {
           memberdef.param.forEach(function (param, argn) {
-            m = m.concat(argn == 0 ? [] : ',');
+            // Add space between arguments
+            m = m.concat(argn == 0 ? [] : ', ');
             m = m.concat([toMarkdown(param.type)]);
             m = m.concat(param.declname ? [' ', toMarkdown(param.declname)] : []);
           });
@@ -291,6 +314,11 @@ module.exports = {
         m = m.concat(memberdef.argsstring[0]._.match(/noexcept$/) ? ' noexcept' : '');
         m = m.concat(memberdef.argsstring[0]._.match(/=\s*delete$/) ? ' = delete' : '');
         m = m.concat(memberdef.argsstring[0]._.match(/=\s*default/) ? ' = default' : '');
+        if (memberdef.$.static == 'yes') {
+          m.forEach(element => {
+           console.log(element); 
+          });
+        }
         break;
 
       case 'variable':
@@ -302,8 +330,19 @@ module.exports = {
         m = m.concat(markdown.refLink(member.name, member.refid));
         break;
 
+      case 'event':
+        // Add prot
+        m = m.concat(memberdef.$.prot, ' '); // public, private, ...
+        m = m.concat(toMarkdown(memberdef.type), ' ');
+        // m = m.concat(memberdef.name[0]._);
+        m = m.concat(markdown.refLink(member.name, member.refid));
+        break;
+        
       case 'property':
-        m = m.concat(['{', member.kind, '} ']);
+        // Do not append {property} for properties
+        // m = m.concat(['{', member.kind, '} ']);
+        // Add prot
+        m = m.concat(memberdef.$.prot, ' '); // public, private, ...
         m = m.concat(toMarkdown(memberdef.type), ' ');
         // m = m.concat(memberdef.name[0]._);
         m = m.concat(markdown.refLink(member.name, member.refid));
@@ -451,9 +490,9 @@ module.exports = {
       case 'typedef':
       case 'interface':
 
-        // set namespace reference
-        var nsp = compound.name.split('::');
-        compound.namespace = nsp.splice(0, nsp.length - 1).join('::');
+        // set C# style namespace reference
+        var nsp = compound.name.split('.');
+        compound.namespace = nsp.splice(0, nsp.length - 1).join('.');
         break;
 
       case 'file':
@@ -510,7 +549,8 @@ module.exports = {
 
   parseIndex: function (root, index, options) {
     index.forEach(function (element) {
-      var doxygen, compound = root.find(element.$.refid, element.name[0], true);
+      // Use C# style namespace format
+      var doxygen, compound = root.find(element.$.refid, element.name[0].replace(/\:\:/g, '.'), true);
       var xmlParser = new xml2js.Parser({
         explicitChildren: true,
         preserveChildrenOrder: true,

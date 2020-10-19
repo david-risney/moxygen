@@ -118,8 +118,13 @@ module.exports = {
         return this.compoundPath(ref, options) + '#' + id;
       } else if (options.classes) {
         var dest = this.findParent(ref, ['namespace', 'class', 'struct', 'interface']);
-        if (!dest || compound.refid == dest.refid)
+        if (!dest || compound.refid == dest.refid) {
+          // Not sure why icorewebview2environment is not covered
+          if (id.startsWith('icorewebview2') && id.endsWith('environment')) {
+            return '';
+          }
           return '#' + id;
+        }
         return this.compoundPath(dest, options);
       } else {
         if (compound.kind == 'page')
@@ -132,19 +137,24 @@ module.exports = {
   compoundPath: function(compound, options) {
     if (compound.kind == 'page') {
       return path.dirname(options.output) + "/page-" + compound.name + ".md";
+    } else if (compound.kind == 'namespace') {
+      return path.dirname(options.output) + "/namespace-" + compound.name.replace(/\./g, '-').toLowerCase() + ".md";
     } else if (options.groups) {
       return util.format(options.output, compound.groupname);
     } else if (options.classes) {
-      return util.format(options.output, compound.name.replace(/\:/g, '-'));
+      return util.format(options.output, compound.name.replace(/\:/g, '-').replace(/\./g, '-').toLowerCase());
     } else {
       return options.output;
     }
   },
 
   writeCompound: function(compound, contents, references, options) {
-    this.writeFile(this.compoundPath(compound, options), contents.map(function(content) {
-      return this.resolveRefs(content, compound, references, options);
-    }.bind(this)));
+    // Not generating markdown files for namespaces
+    if (compound.kind !== 'namespace' || compound.name === "Microsoft.Web.WebView2.Core") {
+      this.writeFile(this.compoundPath(compound, options), contents.map(function(content) {
+        return this.resolveRefs(content, compound, references, options);
+      }.bind(this)));
+    } 
   },
 
   // Write the output file
